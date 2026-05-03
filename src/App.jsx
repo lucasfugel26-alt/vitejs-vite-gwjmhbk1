@@ -4,7 +4,7 @@ import { LayoutDashboard, Calendar, CalendarPlus, Target, ShieldAlert, ListCheck
 const MONTH_NAMES=["","Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
 const WEEKDAYS=["Mo","Di","Mi","Do","Fr","Sa","So"];
 const uid=()=>Math.random().toString(36).slice(2,9);
-const TODAY="2026-04-28";
+const TODAY=new Date().toISOString().split("T")[0];
 const CAT={sport:{label:"Sport",bg:"#fee2e2",text:"#b91c1c"},gesundheit:{label:"Gesundheit",bg:"#d1fae5",text:"#065f46"},ernaehrung:{label:"Ernährung",bg:"#fef3c7",text:"#92400e"},achtsamkeit:{label:"Achtsamkeit",bg:"#ede9fe",text:"#5b21b6"},produktivitaet:{label:"Produktivität",bg:"#dbeafe",text:"#1e40af"},sonstiges:{label:"Sonstiges",bg:"#f1f5f9",text:"#475569"}};
 const C={accent:"#d97706",accentLight:"#fef3c7",accentDark:"#b45309",sidebar:"#0f172a",sidebarText:"#94a3b8",bg:"#f8f7f3",card:"#ffffff",border:"#e2e8f0",text:"#1e293b",muted:"#64748b",danger:"#ef4444",success:"#10b981"};
 
