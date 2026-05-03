@@ -1,4 +1,4 @@
-import { useState, useReducer, createContext, useContext, useEffect } from "react";
+import { useState, useReducer, createContext, useContext, useEffect, useRef } from "react";
 import { LayoutDashboard, Calendar, CalendarPlus, Target, ShieldAlert, ListChecks, Gift, Archive, Settings, Compass, Layers, Check, Star, ChevronLeft, ChevronRight, Plus, Pencil, Trash2, X, CheckCircle2, AlertTriangle, Flame, Circle, RotateCcw, CheckSquare, Square, Clock, Sparkles, ChevronDown, ChevronUp, Database, RefreshCw, Menu } from "lucide-react";
 
 const MONTH_NAMES=["","Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
@@ -66,9 +66,37 @@ const DEMO={
 };
 const EMPTY={monthPlans:[],habitGoals:[],noGos:[],todos:[],activityGroups:[],rewards:[],redemptions:[],dayPlans:[]};
 
+function usePersistentReducer(reducer, initialState) {
+  const BIN_ID = import.meta.env.VITE_JSONBIN_ID;
+  const BIN_KEY = import.meta.env.VITE_JSONBIN_KEY;
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const [loading, setLoading] = useState(true);
+  const timerRef = useRef(null);
+  useEffect(() => {
+    fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+      headers: { 'X-Master-Key': BIN_KEY }
+    }).then(r => r.json()).then(d => {
+      if(d.record) dispatch({ type: '__HYDRATE__', payload: d.record });
+    }).catch(() => {}).finally(() => setLoading(false));
+  }, []);
+  useEffect(() => {
+    if(loading) return;
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+        method: 'PUT',
+        headers: { 'X-Master-Key': BIN_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify(state)
+      });
+    }, 500);
+  }, [state, loading]);
+  return [state, dispatch, loading];
+}
+
 // ─── REDUCER ──────────────────────────────────────────────────────────────────
 function reducer(s,a){
   switch(a.type){
+    case'__HYDRATE__':return{...a.payload};
     case"RESET_DEMO":return{...DEMO};
     case"RESET_EMPTY":return{...EMPTY};
     case"TOGGLE_HABIT":return{...s,habitGoals:s.habitGoals.map(h=>{if(h.id!==a.id)return h;const done=h.completed_dates.includes(TODAY);return{...h,current_count:done?h.current_count-1:h.current_count+1,completed_dates:done?h.completed_dates.filter(d=>d!==TODAY):[...h.completed_dates,TODAY]};})};
@@ -726,12 +754,13 @@ function SettingsPage(){
 
 // ─── APP ROOT ──────────────────────────────────────────────────────────────────
 export default function App(){
-  const[state,dispatch]=useReducer(reducer,DEMO);
+  const[state,dispatch,loading]=usePersistentReducer(reducer,EMPTY);
   const[page,setPage]=useState("dashboard");
   const[params,setParams]=useState({});
   const[sidebarOpen,setSidebarOpen]=useState(false);
   const isMobile=useIsMobile();
   const navigate=(p,ps={})=>{setPage(p);setParams(ps);setSidebarOpen(false);};
+  if(loading) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',fontFamily:'sans-serif'}}>Laden...</div>;
 
   // Close sidebar on desktop resize
   useEffect(()=>{ if(!isMobile) setSidebarOpen(false); },[isMobile]);
