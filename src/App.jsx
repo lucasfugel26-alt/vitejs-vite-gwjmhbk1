@@ -69,11 +69,11 @@ const EMPTY={monthPlans:[],habitGoals:[],noGos:[],todos:[],activityGroups:[],rew
 function usePersistentReducer(reducer, initialState) {
   const BIN_ID = import.meta.env.VITE_JSONBIN_ID;
   const BIN_KEY = import.meta.env.VITE_JSONBIN_KEY;
-  if (!BIN_ID || !BIN_KEY) { setLoading(false); return; }
   const [state, dispatch] = useReducer(reducer, initialState);
   const [loading, setLoading] = useState(true);
   const timerRef = useRef(null);
   useEffect(() => {
+    if (!BIN_ID || !BIN_KEY) { setLoading(false); return; }
     fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
       headers: { 'X-Master-Key': BIN_KEY }
     }).then(r => r.json()).then(d => {
@@ -84,6 +84,7 @@ function usePersistentReducer(reducer, initialState) {
     if(loading) return;
     clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
+      if (!BIN_ID || !BIN_KEY) return;
       fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
         method: 'PUT',
         headers: { 'X-Master-Key': BIN_KEY, 'Content-Type': 'application/json' },
@@ -761,10 +762,11 @@ export default function App(){
   const[sidebarOpen,setSidebarOpen]=useState(false);
   const isMobile=useIsMobile();
   const navigate=(p,ps={})=>{setPage(p);setParams(ps);setSidebarOpen(false);};
-  if(loading) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',fontFamily:'sans-serif'}}>Laden...</div>;
 
   // Close sidebar on desktop resize
   useEffect(()=>{ if(!isMobile) setSidebarOpen(false); },[isMobile]);
+
+  if(loading) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',fontFamily:'sans-serif'}}>Laden...</div>;
 
   const pages={dashboard:<Dashboard/>,dayview:<DayView date={params.date}/>,habits:<Habits/>,nogos:<NoGos/>,todos:<Todos/>,rewards:<Rewards/>,planday:<PlanDay/>,calendar:<MonthCalendar/>,aktivitaeten:<Aktivitaeten/>,archive:<ArchivePage/>,settings:<SettingsPage/>};
 
