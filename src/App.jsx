@@ -266,7 +266,7 @@ function Dashboard(){
     {/* Today Card */}
     <Card style={{padding:isMobile?"16px":"24px",marginBottom:"16px"}}>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"14px"}}>
-        <div><h2 style={{margin:0,fontSize:"15px",fontWeight:600,color:C.text}}>Heute — 28. April 2026</h2><p style={{margin:"2px 0 0",fontSize:"12px",color:C.muted}}>Dienstag</p></div>
+        <div><h2 style={{margin:0,fontSize:"15px",fontWeight:600,color:C.text}}>Heute — {new Date().toLocaleDateString("de-DE",{day:"numeric",month:"long",year:"numeric"})}</h2><p style={{margin:"2px 0 0",fontSize:"12px",color:C.muted}}>{new Date().toLocaleDateString("de-DE",{weekday:"long"})}</p></div>
         {tp
           ?<button onClick={()=>navigate("dayview",{date:TODAY})} style={{background:C.accentLight,border:"none",borderRadius:"8px",padding:"6px 12px",fontSize:"12px",fontWeight:500,color:C.accent,cursor:"pointer",fontFamily:"inherit",whiteSpace:"nowrap"}}>Ansicht →</button>
           :<Btn onClick={()=>navigate("planday")} size="sm"><Plus size={13}/>Plan erstellen</Btn>}
@@ -417,7 +417,7 @@ function Habits(){
     {habits.length===0?<Empty icon={Target} title="Noch keine Gewohnheiten" desc="Erstelle deine erste monatliche Gewohnheit."/>:
     <div style={{display:"flex",flexDirection:"column",gap:"12px"}}>
       {habits.map(h=>{const pct=Math.round(h.current_count/h.target_count*100);const doneToday=h.completed_dates.includes(TODAY);const cat=CAT[h.category]||CAT.sonstiges;
-        let streak=0;for(let i=0;i<30;i++){const d=new Date("2026-04-28");d.setDate(d.getDate()-i);if(h.completed_dates.includes(d.toISOString().split("T")[0]))streak++;else break;}
+        let streak=0;for(let i=0;i<30;i++){const d=new Date(TODAY);d.setDate(d.getDate()-i);if(h.completed_dates.includes(d.toISOString().split("T")[0]))streak++;else break;}
         return <Card key={h.id} style={{padding:isMobile?"14px":"18px"}}>
           <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:"12px"}}>
             <div style={{flex:1,minWidth:0}}>
@@ -580,7 +580,7 @@ function PlanDay(){
   const finish=()=>{if(!mp)return;const tasks=[...selH.map(h=>({id:uid(),name:h.name,source:"habit",completed:false})),...selA.map(a=>({id:uid(),name:a.name,source:"activity_group",completed:false})),...customs.map(n=>({id:uid(),name:n,source:"custom",completed:false}))];dispatch({type:"CREATE_DAY_PLAN",p:{month_plan_id:mp.id,date:TODAY,planned_tasks:tasks}});navigate("dayview",{date:TODAY});};
   const STEPS=["Habits","Aktivitäten","Eigene","Fertig"];const tot=selH.length+selA.length+customs.length;
   return <div>
-    <PageHeader title="Tag planen" subtitle="28. April 2026"/>
+    <PageHeader title="Tag planen" subtitle={new Date().toLocaleDateString("de-DE",{day:"numeric",month:"long",year:"numeric"})}/>
     <div style={{display:"flex",alignItems:"center",gap:"4px",marginBottom:"24px",overflowX:"auto",paddingBottom:"4px"}}>
       {STEPS.map((s,i)=><div key={i} style={{display:"flex",alignItems:"center",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"center",gap:"5px"}}><div style={{width:"24px",height:"24px",borderRadius:"999px",fontSize:"11px",fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",background:i+1<=step?C.accent:"#f1f5f9",color:i+1<=step?"#fff":C.muted,flexShrink:0}}>{i+1<=step&&i+1<step?<Check size={12}/>:i+1}</div><span style={{fontSize:"11px",color:i+1===step?C.text:C.muted,fontWeight:i+1===step?600:400,whiteSpace:"nowrap"}}>{s}</span></div>
