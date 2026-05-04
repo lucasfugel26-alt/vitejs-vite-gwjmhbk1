@@ -69,6 +69,7 @@ const EMPTY={monthPlans:[],habitGoals:[],noGos:[],todos:[],activityGroups:[],rew
 function usePersistentReducer(reducer, initialState) {
   const BIN_ID = import.meta.env.VITE_JSONBIN_ID;
   const BIN_KEY = import.meta.env.VITE_JSONBIN_KEY;
+  if (!BIN_ID || !BIN_KEY) { setLoading(false); return; }
   const [state, dispatch] = useReducer(reducer, initialState);
   const [loading, setLoading] = useState(true);
   const timerRef = useRef(null);
