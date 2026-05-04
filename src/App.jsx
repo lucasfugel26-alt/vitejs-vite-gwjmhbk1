@@ -1,5 +1,5 @@
 import { useState, useReducer, createContext, useContext, useEffect, useRef } from "react";
-import { LayoutDashboard, Calendar, CalendarPlus, Target, ShieldAlert, ListChecks, Gift, Archive, Settings, Compass, Layers, Check, Star, ChevronLeft, ChevronRight, Plus, Pencil, Trash2, X, CheckCircle2, AlertTriangle, Flame, Circle, RotateCcw, CheckSquare, Square, Clock, Sparkles, ChevronDown, ChevronUp, Database, RefreshCw, Menu } from "lucide-react";
+import { LayoutDashboard, Calendar, CalendarPlus, Target, ShieldAlert, ListChecks, Gift, Archive, Settings, Compass, Layers, Check, Star, ChevronLeft, ChevronRight, Plus, Pencil, Trash2, X, CheckCircle2, AlertTriangle, Flame, Circle, RotateCcw, CheckSquare, Square, Clock, Sparkles, ChevronDown, ChevronUp, RefreshCw, Menu } from "lucide-react";
 
 const MONTH_NAMES=["","Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
 const WEEKDAYS=["Mo","Di","Mi","Do","Fr","Sa","So"];
@@ -19,52 +19,8 @@ function useIsMobile() {
   return isMobile;
 }
 
-// ─── DEMO DATA ────────────────────────────────────────────────────────────────
-const DEMO={
-  monthPlans:[
-    {id:"mp1",year:2026,month:4,month_name:"April",status:"active",reflection:"",overall_rating:null},
-    {id:"mp2",year:2026,month:3,month_name:"März",status:"completed",reflection:"Ein sehr produktiver Monat. Sportziele fast erreicht, weniger Social Media war spürbar positiv.",overall_rating:4},
-  ],
-  habitGoals:[
-    {id:"h1",month_plan_id:"mp1",name:"Sport / Bewegung",description:"Mind. 30 Min. täglich aktiv",target_count:20,current_count:12,category:"sport",completed_dates:["2026-04-01","2026-04-03","2026-04-05","2026-04-07","2026-04-09","2026-04-11","2026-04-14","2026-04-16","2026-04-18","2026-04-21","2026-04-24","2026-04-26"]},
-    {id:"h2",month_plan_id:"mp1",name:"Meditation",description:"10 Min. Achtsamkeit morgens",target_count:25,current_count:18,category:"achtsamkeit",completed_dates:["2026-04-01","2026-04-02","2026-04-03","2026-04-05","2026-04-06","2026-04-07","2026-04-08","2026-04-09","2026-04-10","2026-04-12","2026-04-14","2026-04-15","2026-04-17","2026-04-19","2026-04-21","2026-04-23","2026-04-25","2026-04-27"]},
-    {id:"h3",month_plan_id:"mp1",name:"Lesen",description:"Mind. 20 Seiten täglich",target_count:20,current_count:14,category:"produktivitaet",completed_dates:["2026-04-02","2026-04-04","2026-04-06","2026-04-08","2026-04-10","2026-04-12","2026-04-14","2026-04-16","2026-04-18","2026-04-20","2026-04-22","2026-04-24","2026-04-26","2026-04-27"]},
-    {id:"h4",month_plan_id:"mp1",name:"2L Wasser täglich",description:"Hydriert durch den Tag",target_count:28,current_count:21,category:"ernaehrung",completed_dates:["2026-04-01","2026-04-02","2026-04-03","2026-04-04","2026-04-05","2026-04-06","2026-04-07","2026-04-09","2026-04-10","2026-04-11","2026-04-12","2026-04-13","2026-04-14","2026-04-15","2026-04-16","2026-04-18","2026-04-20","2026-04-22","2026-04-24","2026-04-25","2026-04-27"]},
-    {id:"h5",month_plan_id:"mp1",name:"Kein Alkohol",description:"Alkoholfrei durch April",target_count:30,current_count:26,category:"gesundheit",completed_dates:[]},
-  ],
-  noGos:[
-    {id:"n1",month_plan_id:"mp1",name:"Kein Social Media vor 10 Uhr",description:"Morgen gehört mir",violation_count:3,violation_dates:["2026-04-08","2026-04-15","2026-04-22"]},
-    {id:"n2",month_plan_id:"mp1",name:"Kein Fast Food",description:"Bewusst & gesund essen",violation_count:1,violation_dates:["2026-04-12"]},
-    {id:"n3",month_plan_id:"mp1",name:"Kein Doom-Scrolling nach 22 Uhr",description:"Handy weg vor dem Schlafen",violation_count:2,violation_dates:["2026-04-05","2026-04-19"]},
-  ],
-  todos:[
-    {id:"t1",month_plan_id:"mp1",name:"Steuererklärung einreichen",description:"ELSTER nutzen",due_date:"2026-04-30",status:"offen",completed_date:null,reward_unlocked:false},
-    {id:"t2",month_plan_id:"mp1",name:"Zahnarzttermin buchen",description:"Halbjährl. Kontrolle",due_date:"2026-04-25",status:"erledigt",completed_date:"2026-04-20",reward_unlocked:true},
-    {id:"t3",month_plan_id:"mp1",name:"Frühjahrsputz",description:"Alle Zimmer",due_date:"2026-04-28",status:"geplant",completed_date:null,reward_unlocked:false},
-    {id:"t4",month_plan_id:"mp1",name:"Portfolio aktualisieren",description:"Neue Projekte",due_date:"2026-05-01",status:"offen",completed_date:null,reward_unlocked:false},
-    {id:"t5",month_plan_id:"mp1",name:"Geburtstagskarte schreiben",description:"Für Oma",due_date:"2026-04-29",status:"erledigt",completed_date:"2026-04-27",reward_unlocked:true},
-  ],
-  activityGroups:[
-    {id:"ag1",name:"Sport & Bewegung",description:"Tägliche Bewegungseinheiten",daily_count:1,options:[{id:"ao1",name:"Yoga (30 Min.)",last_suggested:"2026-04-25"},{id:"ao2",name:"Joggen im Park",last_suggested:"2026-04-22"},{id:"ao3",name:"Radfahren",last_suggested:"2026-04-27"},{id:"ao4",name:"Schwimmen",last_suggested:"2026-04-20"},{id:"ao5",name:"HIIT Training",last_suggested:"2026-04-18"}]},
-    {id:"ag2",name:"Kreativität",description:"Kreative Auszeiten täglich",daily_count:1,options:[{id:"ao6",name:"Zeichnen",last_suggested:"2026-04-26"},{id:"ao7",name:"Tagebuch schreiben",last_suggested:"2026-04-23"},{id:"ao8",name:"Musik machen",last_suggested:"2026-04-15"}]},
-  ],
-  rewards:[
-    {id:"r1",name:"Kinoabend",description:"Film meiner Wahl",is_reusable:true,times_redeemed:2,is_active:true},
-    {id:"r2",name:"Massage (60 Min.)",description:"Entspannungsmassage",is_reusable:false,times_redeemed:0,is_active:true},
-    {id:"r3",name:"Lieblingsrestaurant",description:"Schön essen gehen",is_reusable:true,times_redeemed:3,is_active:true},
-    {id:"r4",name:"Neues Buch",description:"Buch meiner Wahl",is_reusable:true,times_redeemed:1,is_active:true},
-  ],
-  redemptions:[
-    {id:"rd1",reward_id:"r1",reward_name:"Kinoabend",todo_id:"t2",todo_name:"Zahnarzttermin buchen",month_plan_id:"mp1",redeemed_date:"2026-04-20"},
-    {id:"rd2",reward_id:"r3",reward_name:"Lieblingsrestaurant",todo_id:"t5",todo_name:"Geburtstagskarte schreiben",month_plan_id:"mp1",redeemed_date:"2026-04-27"},
-  ],
-  dayPlans:[
-    {id:"dp1",month_plan_id:"mp1",date:TODAY,is_planned:true,is_completed:false,
-     planned_tasks:[{id:"tk1",name:"Yoga (30 Min.)",source:"activity_group",completed:true},{id:"tk2",name:"Meditation (10 Min.)",source:"habit",completed:true},{id:"tk3",name:"Lesen (20 Seiten)",source:"habit",completed:false},{id:"tk4",name:"Frühjahrsputz",source:"todo",completed:false},{id:"tk5",name:"Tagebuch schreiben",source:"custom",completed:false}],
-     notes:"Guter Start! Yoga war heute besonders schön.",rating:4,no_go_check:true},
-  ],
-};
 const EMPTY={monthPlans:[],habitGoals:[],noGos:[],todos:[],activityGroups:[],rewards:[],redemptions:[],dayPlans:[]};
+const curMP=plans=>{const n=new Date();return plans.find(m=>m.year===n.getFullYear()&&m.month===n.getMonth()+1);};
 
 function usePersistentReducer(reducer, initialState) {
   const BIN_ID = import.meta.env.VITE_JSONBIN_ID;
@@ -99,7 +55,6 @@ function usePersistentReducer(reducer, initialState) {
 function reducer(s,a){
   switch(a.type){
     case'__HYDRATE__':return{...a.payload};
-    case"RESET_DEMO":return{...DEMO};
     case"RESET_EMPTY":return{...EMPTY};
     case"TOGGLE_HABIT":return{...s,habitGoals:s.habitGoals.map(h=>{if(h.id!==a.id)return h;const done=h.completed_dates.includes(TODAY);return{...h,current_count:done?h.current_count-1:h.current_count+1,completed_dates:done?h.completed_dates.filter(d=>d!==TODAY):[...h.completed_dates,TODAY]};})};
     case"CREATE_HABIT":return{...s,habitGoals:[...s.habitGoals,{id:uid(),current_count:0,completed_dates:[],...a.p}]};
@@ -246,8 +201,8 @@ function TopBar({onMenuClick,page}){
 function Dashboard(){
   const{state,navigate}=useApp();
   const isMobile=useIsMobile();
-  const mp=state.monthPlans.find(m=>m.status==="active");
-  if(!mp)return <div><PageHeader title="Dashboard"/><Empty icon={Compass} title="Noch kein aktiver Monat" desc="Erstelle einen Monat unter Einstellungen."/></div>;
+  const mp=curMP(state.monthPlans);
+  if(!mp)return <div><PageHeader title="Dashboard"/><Empty icon={Compass} title="Noch kein Monat angelegt" desc="Der aktuelle Monat wird gleich automatisch erstellt."/></div>;
   const habits=state.habitGoals.filter(h=>h.month_plan_id===mp.id);
   const noGos=state.noGos.filter(n=>n.month_plan_id===mp.id);
   const todos=state.todos.filter(t=>t.month_plan_id===mp.id);
@@ -326,12 +281,12 @@ function DayView({date:initDate}){
   const[editingTaskId,setEditingTaskId]=useState(null);
   const[editingTaskName,setEditingTaskName]=useState("");
   const[monthModal,setMonthModal]=useState(false);
-  const mp=state.monthPlans.find(m=>m.status==="active");
+  const mp=curMP(state.monthPlans);
   const dp=state.dayPlans.find(d=>d.date===date&&d.month_plan_id===mp?.id);
   const shift=n=>{const[y,m,d]=date.split("-").map(Number);const nd=new Date(y,m-1,d+n);setDate(`${nd.getFullYear()}-${String(nd.getMonth()+1).padStart(2,"0")}-${String(nd.getDate()).padStart(2,"0")}`);};
   const fmt=ds=>{const[y,m,d]=ds.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"});};
   const isLastDay=()=>{const[y,m,d]=date.split("-").map(Number);return d===new Date(y,m,0).getDate();};
-  const handleCompleteDay=()=>{if(!dp)return;dispatch({type:"COMPLETE_DAY",id:dp.id});if(isLastDay()&&mp?.status==="active")setTimeout(()=>setMonthModal(true),400);};
+  const handleCompleteDay=()=>{if(!dp)return;dispatch({type:"COMPLETE_DAY",id:dp.id});if(isLastDay()&&mp)setTimeout(()=>setMonthModal(true),400);};
   const startEdit=task=>{setEditingTaskId(task.id);setEditingTaskName(task.name);};
   const saveEdit=()=>{if(!dp||!editingTaskName.trim())return;dispatch({type:"RENAME_TASK",planId:dp.id,taskId:editingTaskId,name:editingTaskName.trim()});setEditingTaskId(null);};
   const done=dp?dp.planned_tasks.filter(t=>t.completed).length:0;
@@ -405,7 +360,7 @@ function DayView({date:initDate}){
 function Habits(){
   const{state,dispatch}=useApp();
   const isMobile=useIsMobile();
-  const mp=state.monthPlans.find(m=>m.status==="active");
+  const mp=curMP(state.monthPlans);
   const habits=state.habitGoals.filter(h=>h.month_plan_id===mp?.id);
   const[modal,setModal]=useState(false);const[edit,setEdit]=useState(null);
   const[form,setForm]=useState({name:"",description:"",target_count:15,category:"sonstiges"});
@@ -449,7 +404,7 @@ function Habits(){
 function NoGos(){
   const{state,dispatch}=useApp();
   const isMobile=useIsMobile();
-  const mp=state.monthPlans.find(m=>m.status==="active");
+  const mp=curMP(state.monthPlans);
   const noGos=state.noGos.filter(n=>n.month_plan_id===mp?.id);
   const[modal,setModal]=useState(false);const[edit,setEdit]=useState(null);
   const[form,setForm]=useState({name:"",description:""});
@@ -484,7 +439,7 @@ function NoGos(){
 function Todos(){
   const{state,dispatch}=useApp();
   const isMobile=useIsMobile();
-  const mp=state.monthPlans.find(m=>m.status==="active");
+  const mp=curMP(state.monthPlans);
   const todos=state.todos.filter(t=>t.month_plan_id===mp?.id);
   const[filter,setFilter]=useState("alle");const[modal,setModal]=useState(false);
   const[redeemTodo,setRedeemTodo]=useState(null);const[edit,setEdit]=useState(null);
@@ -540,7 +495,7 @@ function Todos(){
 function Rewards(){
   const{state,dispatch}=useApp();
   const isMobile=useIsMobile();
-  const mp=state.monthPlans.find(m=>m.status==="active");
+  const mp=curMP(state.monthPlans);
   const redeem=state.redemptions.filter(r=>r.month_plan_id===mp?.id);
   const[modal,setModal]=useState(false);const[edit,setEdit]=useState(null);
   const[form,setForm]=useState({name:"",description:"",is_reusable:true});
@@ -573,7 +528,7 @@ function Rewards(){
 function PlanDay(){
   const{state,dispatch,navigate}=useApp();
   const isMobile=useIsMobile();
-  const mp=state.monthPlans.find(m=>m.status==="active");
+  const mp=curMP(state.monthPlans);
   const[step,setStep]=useState(1);const[selH,setSelH]=useState([]);const[selA,setSelA]=useState([]);const[customs,setCustoms]=useState([]);const[newC,setNewC]=useState("");
   const habits=state.habitGoals.filter(h=>h.month_plan_id===mp?.id);
   const suggested=state.activityGroups.flatMap(ag=>{const sorted=[...ag.options].sort((a,b)=>(a.last_suggested||"")<(b.last_suggested||"")?-1:1);return sorted.slice(0,ag.daily_count).map(o=>({id:o.id,name:o.name,group:ag.name}));});
@@ -604,15 +559,25 @@ function PlanDay(){
 function MonthCalendar(){
   const{state,navigate}=useApp();
   const isMobile=useIsMobile();
-  const mp=state.monthPlans.find(m=>m.status==="active");
-  if(!mp)return <Empty icon={Calendar} title="Kein aktiver Monat" desc="Erstelle einen Monat in den Einstellungen."/>;
-  const dps=state.dayPlans.filter(d=>d.month_plan_id===mp.id);
-  const{year,month}=mp;
-  const dim=new Date(year,month,0).getDate();
-  let sdow=new Date(year,month-1,1).getDay();sdow=sdow===0?6:sdow-1;
+  const now=new Date();
+  const[viewYear,setViewYear]=useState(now.getFullYear());
+  const[viewMonth,setViewMonth]=useState(now.getMonth()+1);
+  const prevMo=()=>{if(viewMonth===1){setViewYear(y=>y-1);setViewMonth(12);}else setViewMonth(m=>m-1);};
+  const nextMo=()=>{if(viewMonth===12){setViewYear(y=>y+1);setViewMonth(1);}else setViewMonth(m=>m+1);};
+  const mp=state.monthPlans.find(m=>m.year===viewYear&&m.month===viewMonth);
+  const dps=mp?state.dayPlans.filter(d=>d.month_plan_id===mp.id):[];
+  const dim=new Date(viewYear,viewMonth,0).getDate();
+  let sdow=new Date(viewYear,viewMonth-1,1).getDay();sdow=sdow===0?6:sdow-1;
   const cells=[];for(let i=0;i<sdow;i++)cells.push(null);for(let d=1;d<=dim;d++)cells.push(d);
   return <div>
-    <PageHeader title={`${MONTH_NAMES[month]} ${year}`} subtitle="Monatsübersicht"/>
+    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"20px",gap:"12px"}}>
+      <button onClick={prevMo} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:"8px",padding:"8px",cursor:"pointer",display:"flex",flexShrink:0}}><ChevronLeft size={16} color={C.text}/></button>
+      <div style={{textAlign:"center"}}>
+        <h1 style={{margin:0,fontSize:isMobile?"20px":"24px",fontWeight:700,color:C.text}}>{MONTH_NAMES[viewMonth]} {viewYear}</h1>
+        <p style={{margin:"2px 0 0",color:C.muted,fontSize:"13px"}}>Monatsübersicht</p>
+      </div>
+      <button onClick={nextMo} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:"8px",padding:"8px",cursor:"pointer",display:"flex",flexShrink:0}}><ChevronRight size={16} color={C.text}/></button>
+    </div>
     <Card style={{padding:isMobile?"12px":"20px"}}>
       <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:"2px",marginBottom:"6px"}}>
         {WEEKDAYS.map(d=><div key={d} style={{textAlign:"center",fontSize:"11px",fontWeight:600,color:C.muted,padding:"4px 0"}}>{d}</div>)}
@@ -620,7 +585,7 @@ function MonthCalendar(){
       <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:isMobile?"3px":"5px"}}>
         {cells.map((day,i)=>{
           if(!day)return <div key={i}/>;
-          const ds=`${year}-${String(month).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+          const ds=`${viewYear}-${String(viewMonth).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
           const dp=dps.find(d=>d.date===ds);const isT=ds===TODAY;const isPast=ds<TODAY;
           return <button key={i} onClick={()=>navigate("dayview",{date:ds})} style={{paddingTop:"100%",position:"relative",borderRadius:isMobile?"6px":"10px",border:"none",cursor:"pointer",background:isT?C.accent:dp?.is_completed?"#d1fae5":dp?.is_planned?"#dbeafe":isPast?"#f8fafc":"#fff",outline:isT?`2px solid ${C.accentDark}`:`1px solid ${C.border}`,outlineOffset:isT?"1px":"-0.5px"}}>
             <span style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"2px"}}>
@@ -675,7 +640,7 @@ function Aktivitaeten(){
 // ─── ARCHIVE ──────────────────────────────────────────────────────────────────
 function ArchivePage(){
   const{state,dispatch}=useApp();
-  const archived=state.monthPlans.filter(m=>m.status!=="active");
+  const n=new Date();const archived=state.monthPlans.filter(m=>!(m.year===n.getFullYear()&&m.month===n.getMonth()+1));
   const[expanded,setExpanded]=useState(null);
   const[editModal,setEditModal]=useState(null);
   const[refl,setRefl]=useState("");const[rating,setRating]=useState(0);
@@ -711,45 +676,22 @@ function ArchivePage(){
 function SettingsPage(){
   const{state,dispatch}=useApp();
   const isMobile=useIsMobile();
-  const mp=state.monthPlans.find(m=>m.status==="active");
-  const[newM,setNewM]=useState({year:2026,month:5});
+  const sorted=[...state.monthPlans].sort((a,b)=>b.year-a.year||b.month-a.month);
   return <div>
     <PageHeader title="Einstellungen"/>
-    <Card style={{padding:isMobile?"14px":"20px",marginBottom:"16px",borderLeft:`4px solid ${C.accent}`}}>
-      <div style={{display:"flex",alignItems:"flex-start",gap:"12px"}}>
-        <div style={{width:"34px",height:"34px",borderRadius:"8px",background:C.accentLight,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><Database size={15} color={C.accent}/></div>
-        <div style={{flex:1}}>
-          <p style={{margin:"0 0 3px",fontWeight:600,fontSize:"14px",color:C.text}}>Demo-Daten aktiv</p>
-          <p style={{margin:"0 0 12px",fontSize:"12px",color:C.muted}}>Die App startet mit Beispieldaten. Alle Einträge können bearbeitet oder gelöscht werden.</p>
-          <div style={{display:"flex",gap:"8px",flexWrap:"wrap"}}>
-            <Btn v="secondary" size="sm" onClick={()=>dispatch({type:"RESET_DEMO"})}><RefreshCw size={12}/>Demo zurücksetzen</Btn>
-            <Btn v="danger" size="sm" onClick={()=>dispatch({type:"RESET_EMPTY"})}>Alle Daten löschen</Btn>
-          </div>
-        </div>
-      </div>
-    </Card>
-    {mp&&<Card style={{padding:isMobile?"14px":"20px",marginBottom:"16px"}}>
-      <h3 style={{margin:"0 0 6px",fontSize:"14px",fontWeight:600,color:C.text}}>Aktiver Monat</h3>
-      <p style={{margin:"0 0 8px",fontSize:"13px",color:C.muted}}>{MONTH_NAMES[mp.month]} {mp.year} — Der Monat schließt automatisch beim letzten Tagesabschluss.</p>
-    </Card>}
     <Card style={{padding:isMobile?"14px":"20px",marginBottom:"16px"}}>
-      <h3 style={{margin:"0 0 14px",fontSize:"14px",fontWeight:600,color:C.text}}>Neuen Monat erstellen</h3>
-      <div style={{display:"flex",gap:"12px",marginBottom:"14px",flexWrap:isMobile?"wrap":"nowrap"}}>
-        <Field label="Jahr"><input type="number" value={newM.year} onChange={e=>setNewM({...newM,year:+e.target.value})} style={{...iStyle,width:isMobile?"100%":"120px"}}/></Field>
-        <Field label="Monat"><select value={newM.month} onChange={e=>setNewM({...newM,month:+e.target.value})} style={{...iStyle,background:"#fff",width:isMobile?"100%":"160px"}}>{MONTH_NAMES.slice(1).map((n,i)=><option key={i+1} value={i+1}>{n}</option>)}</select></Field>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"14px"}}>
+        <h3 style={{margin:0,fontSize:"14px",fontWeight:600,color:C.text}}>Alle Monate</h3>
+        <Btn v="danger" size="sm" onClick={()=>dispatch({type:"RESET_EMPTY"})}><Trash2 size={12}/>Alle Daten löschen</Btn>
       </div>
-      <Btn onClick={()=>{if(!state.monthPlans.some(m=>m.year===newM.year&&m.month===newM.month))dispatch({type:"CREATE_MONTH",p:{year:newM.year,month:newM.month,month_name:MONTH_NAMES[newM.month]}});}}><Plus size={14}/>Monat erstellen</Btn>
-    </Card>
-    <Card style={{padding:isMobile?"14px":"20px"}}>
-      <h3 style={{margin:"0 0 14px",fontSize:"14px",fontWeight:600,color:C.text}}>Alle Monate</h3>
-      {state.monthPlans.length===0?<p style={{color:C.muted,fontSize:"13px",margin:0}}>Noch keine Monate.</p>:
-      state.monthPlans.map(m=><div key={m.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 0",borderBottom:`1px solid ${C.border}`}}>
+      {sorted.length===0?<p style={{color:C.muted,fontSize:"13px",margin:0}}>Noch keine Monate vorhanden.</p>:
+      sorted.map(m=>{const n=new Date();const isCur=m.year===n.getFullYear()&&m.month===n.getMonth()+1;return <div key={m.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 0",borderBottom:`1px solid ${C.border}`}}>
         <span style={{fontSize:"13px",fontWeight:500,color:C.text}}>{MONTH_NAMES[m.month]} {m.year}</span>
         <div style={{display:"flex",alignItems:"center",gap:"6px"}}>
-          <Badge color={m.status==="active"?"green":m.status==="completed"?"blue":"gray"}>{m.status==="active"?"Aktiv":m.status==="completed"?"Abgeschlossen":"Archiviert"}</Badge>
-          {m.status!=="active"&&<IconBtn icon={Trash2} onClick={()=>dispatch({type:"DELETE_MONTH",id:m.id})} color="#fca5a5" title="Löschen"/>}
+          <Badge color={isCur?"green":m.status==="completed"?"blue":"gray"}>{isCur?"Aktuell":m.status==="completed"?"Abgeschlossen":"Vergangen"}</Badge>
+          {!isCur&&<IconBtn icon={Trash2} onClick={()=>dispatch({type:"DELETE_MONTH",id:m.id})} color="#fca5a5" title="Löschen"/>}
         </div>
-      </div>)}
+      </div>;})}
     </Card>
   </div>;
 }
@@ -765,6 +707,14 @@ export default function App(){
 
   // Close sidebar on desktop resize
   useEffect(()=>{ if(!isMobile) setSidebarOpen(false); },[isMobile]);
+
+  // Auto-create current month if it doesn't exist yet
+  useEffect(()=>{
+    if(loading) return;
+    const n=new Date();const y=n.getFullYear();const mo=n.getMonth()+1;
+    if(!state.monthPlans.some(m=>m.year===y&&m.month===mo))
+      dispatch({type:"CREATE_MONTH",p:{year:y,month:mo,month_name:MONTH_NAMES[mo]}});
+  },[loading]);
 
   if(loading) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',fontFamily:'sans-serif'}}>Laden...</div>;
 
